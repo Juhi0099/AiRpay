@@ -11,6 +11,7 @@ A hackathon prototype for offline voucher authorization and later batch settleme
 - Offline double-spend cannot be prevented by an offline merchant without trusted hardware/secure counters, shared connectivity, or accepting credit risk. The contract prevents a voucher nonce from settling twice onchain.
 - The QR uses one static voucher payload that expires quickly. `qrcode.react` renders it; animated chunked QR and NFC transport are extension points, not implemented here.
 - Auto-sync submits vouchers only when a wallet is available in the browser or `VITE_RELAYER_PRIVATE_KEY` is configured. Never expose a relayer private key in a deployed frontend. Use a backend relayer in production.
+- Settled activity includes the emitted voucher hash, block information, transaction hash, and a link to the Monad Testnet Explorer.
 - The `verifyVoucherLocally` helper uses the same EIP-712 domain as the contract. Configure the deployed contract address before issuing vouchers.
 
 ## Requirements

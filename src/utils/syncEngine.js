@@ -43,8 +43,17 @@ export async function syncPendingVouchers() {
           const parsed = contract.interface.parseLog(log);
           if (!parsed || (parsed.name !== "VoucherSettled" && parsed.name !== "VoucherRejected")) continue;
           const key = `${parsed.args.payer.toLowerCase()}-${parsed.args.nonce}`;
-          if (parsed.name === "VoucherSettled" || outcomes.get(key) !== "settled") {
-            outcomes.set(key, parsed.name === "VoucherSettled" ? "settled" : `rejected (reason ${parsed.args.reason})`);
+          if (parsed.name === "VoucherSettled" || outcomes.get(key)?.status !== "settled") {
+            outcomes.set(key, parsed.name === "VoucherSettled"
+              ? {
+                  status: "settled",
+                  voucherHash: parsed.args.voucherHash,
+                  amount: parsed.args.amount.toString(),
+                  payer: parsed.args.payer,
+                  merchant: parsed.args.merchant,
+                  nonce: parsed.args.nonce.toString(),
+                }
+              : { status: `rejected (reason ${parsed.args.reason})` });
           }
         }
         const processed = new Set();
@@ -54,11 +63,17 @@ export async function syncPendingVouchers() {
           if (processed.has(key)) continue;
           processed.add(key);
           const outcome = outcomes.get(key);
-          if (outcome === "settled") {
-            await markVoucherSettled(id, tx.hash);
+          if (outcome?.status === "settled") {
+            await markVoucherSettled(id, tx.hash, {
+              ...outcome,
+              blockNumber: receipt.blockNumber,
+              blockHash: receipt.blockHash,
+              transactionIndex: receipt.index,
+              gasUsed: receipt.gasUsed.toString(),
+            });
             submitted += 1;
           } else {
-            const error = outcome || "No settlement outcome event was emitted.";
+            const error = outcome?.status || "No settlement outcome event was emitted.";
             await markVoucherPending(id, error);
             rejected += 1;
           }

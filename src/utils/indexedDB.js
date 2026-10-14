@@ -28,16 +28,23 @@ export async function getVoucher(id) { return (await dbPromise).get(STORE, id); 
 export async function getAllVouchers() { return (await dbPromise).getAll(STORE); }
 export async function getUnsyncedVouchers() { return (await dbPromise).getAllFromIndex(STORE, "status", "pending"); }
 
-export async function markVoucherSettled(id, txHash) {
+export async function markVoucherSettled(id, txHash, receiptDetails = {}) {
   const db = await dbPromise;
   const tx = db.transaction(STORE, "readwrite");
   const store = tx.objectStore(STORE);
   const record = await store.get(id);
   if (record) {
-    await store.put({ ...record, status: "settled", txHash, settledAt: Date.now(), updatedAt: Date.now() });
+    await store.put({
+      ...record,
+      status: "settled",
+      txHash,
+      receiptDetails,
+      settledAt: Date.now(),
+      updatedAt: Date.now(),
+    });
   }
   await tx.done;
-  return record ? { ...record, status: "settled", txHash } : null;
+  return record ? { ...record, status: "settled", txHash, receiptDetails } : null;
 }
 
 export async function markVoucherFailed(id, error) {
