@@ -1,0 +1,35 @@
+{
+  "name": "nosignal-monad-pwa",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "compile:contract": "node scripts/compile-contract.js",
+    "test:contract": "node --test test/VaultEscrow.test.js",
+    "deploy:monad": "node scripts/deploy.js",
+    "validate:env": "node scripts/validate-env.js"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.2.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "dotenv": "^18.0.7",
+    "ethers": "^6.13.4",
+    "html5-qrcode": "^2.3.8",
+    "idb": "^8.0.0",
+    "lucide-react": "^0.468.0",
+    "qrcode.react": "^4.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "solc": "^0.8.20",
+    "vite": "^5.4.11"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "ganache": "^7.9.2",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17"
+  }
+}
